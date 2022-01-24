@@ -15,7 +15,7 @@ public enum Colors: WhenCompliant {
       Colors.red => "#FF0000"
       Colors.green => "#00F000"
       Colors.blue => "#0000FF"
-    }!
+    }
   }
 }
 ```
