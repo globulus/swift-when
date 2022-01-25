@@ -49,7 +49,7 @@ public func when<Enum: WhenCompliant, Result>(_ value: Enum,
   let unhandledCases = Enum.allCases.filter { value in !cases.contains(where: { $0.0.contains(value) }) }
   let elseCause = cases.first(where: { $0.0.contains(nil) })
   if !unhandledCases.isEmpty && elseCause == nil {
-    fatalError("When must have an else clause or handle all cases: \(unhandledCases)!")
+    fatalError("When must have a default clause or handle all cases: \(unhandledCases)!")
   }
   for whenCase in cases {
     if whenCase.0.contains(value) {
@@ -59,7 +59,7 @@ public func when<Enum: WhenCompliant, Result>(_ value: Enum,
   return elseCause!.1
 }
 
-public typealias WhenElement<Result> = (Bool, Result)
+public typealias WhenElement<Result> = (Bool, Result, Bool)
 
 @resultBuilder public struct When<Result> {
   public static func buildArray(_ components: [[WhenElement<Result>]]) -> [WhenElement<Result>] {
@@ -70,16 +70,8 @@ public typealias WhenElement<Result> = (Bool, Result)
       components
   }
 
-  public static func buildEither(first component: [WhenElement<Result>]) -> [WhenElement<Result>] {
-      component
-  }
-
-  public static func buildEither(second component: [WhenElement<Result>]) -> [WhenElement<Result>] {
-      component
-  }
-
   public static func buildExpression(_ route: Result) -> WhenElement<Result> {
-    (true, route)
+    (true, route, true)
   }
 
   public static func buildExpression(_ element: WhenElement<Result>) -> WhenElement<Result> {
@@ -88,16 +80,21 @@ public typealias WhenElement<Result> = (Bool, Result)
 }
 
 public func => <Result>(lhs: Bool, rhs: Result) -> WhenElement<Result> {
-  (lhs, rhs)
+  (lhs, rhs, false)
 }
 
-public func when<Result>(@When<Result> builder: () -> [WhenElement<Result>]) -> Result? {
-  for condition in builder() {
-    if condition.0 {
+public func when<Result>(@When<Result> builder: () -> [WhenElement<Result>]) -> Result {
+  let conditions = builder()
+  guard let elseClause = conditions.first(where: { $0.2 })
+  else {
+    fatalError("A when block requires a default clause!")
+  }
+  for condition in conditions {
+    if condition.0 && !condition.2 {
       return condition.1
     }
   }
-  return nil
+  return elseClause.1
 }
 
 

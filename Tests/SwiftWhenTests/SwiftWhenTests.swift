@@ -6,7 +6,7 @@ func describeNumber(_ n: Int) -> String {
     (n > 0) => "positive"
     (n < 0) => "negative"
     "zero"
-  }!
+  }
 }
 
 enum Colors: WhenCompliant {

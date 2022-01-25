@@ -121,14 +121,17 @@ func describeNumber(_ n: Int) -> String {
     (n > 0) => "positive"
     (n < 0) => "negative"
     "zero" // default clause
-  }!
+  }
 }
 ```
+
+Node that this variant **must have a default clause specified**.
 
 ## What it can't do
 
  * `when` can't work with enums that have associated values. Consequently, it also can't unwrap associated values (i.e, no `case let`).
  * `switch` offers compile-time guarantee that all cases are covered. `when` does that at runtime.
+ * While everything involved is type-safe, if you mess something up you might see a rather unhelpful compilation error message. That, though, is entirely with the Swift compiler team to improve.
 
 ## Installation
 
